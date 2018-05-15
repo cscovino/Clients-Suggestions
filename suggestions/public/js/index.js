@@ -25,10 +25,25 @@ var app = {
   		app.refreshComps();
   	},
 
+  	getTodayDate: function(){
+  		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+		if(dd<10) {
+		    dd = '0'+dd
+		} 
+		if(mm<10) {
+		    mm = '0'+mm
+		} 
+		return today = mm + '/' + dd + '/' + yyyy;
+  	},
+
   	sendSuggestion: function(){
   		document.getElementById('detalles').style.display = 'none';
   		var sugg = document.getElementById('suggestion').value;
-  		firebase.database().ref('pendientes').push({suggestion:sugg,percent:0});
+  		var utc = app.getTodayDate();
+  		firebase.database().ref('pendientes').push({suggestion:sugg,percent:0,date:utc});
       app.closeSugg();
   	},
 
@@ -58,9 +73,10 @@ var app = {
   		for(var key in app.model.pendientes){
   			if (app.model.pendientes[key] != "") {
   				codigo += '<li>'+app.model.pendientes[key].suggestion+'</li>';
-	  			codigo += '<div class="progress" style="width:60%;"><div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"';
+	  			codigo += '<div class="progress" style="width:60%;margin-bottom:5px;"><div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"';
 	  			codigo += 'style="width:'+app.model.pendientes[key].percent+'%;background-color:#295063;" id=bar'+key+'></div></div>'; 
-	  			codigo += "<input id='slider"+key+"' style='width:60%;' class='sliders' style='display:none;' type='text' data-slider-min='0' data-slider-max='100' data-slider-step='1' data-slider-value='45'/>";
+	  			codigo += "<input id='slider"+key+"' style='width:60%;display:none;' class='sliders' type='text' data-slider-min='0' data-slider-max='100' data-slider-step='1' data-slider-value='45'/>";
+  				codigo += "<p>Recibida el: "+app.model.pendientes[key].date+"</p>";
   				aux = 1;
   			}
   		}
